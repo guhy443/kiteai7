@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kite AI Wind Runner — Day 9 Pro</title>
+<style>
+:root{--bg1:#0a1128;--bg2:#1e2a47;--accent:#7c3aed;--accent2:#06b6d4;--success:#10b981;--danger:#ef4444;--gold:#f59e0b}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui;background:linear-gradient(180deg,var(--bg1),var(--bg2));color:#e6eef8;display:grid;place-items:center;min-height:100vh;padding:20px}
+.wrap{width:100%;max-width:920px}
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.02));border-radius:14px;padding:20px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+header h1{font-size:18px;margin:0}
+header .meta{font-size:13px;opacity:.8}
+.start-screen{text-align:center;padding:18px}
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#021025;border:none;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer}
+.btn.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.progress-outer{flex:1;margin:0 12px;background:rgba(255,255,255,0.04);border-radius:999px;height:12px;overflow:hidden}
+.progress-inner{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width 0.35s}
+.grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+.quiz{padding:12px}
+.qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.qnum{font-size:13px;color:rgba(230,238,248,0.8)}
+.timer{display:flex;align-items:center;gap:8px}
+.timer .circle{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,0.03);font-weight:700}
+.question{font-size:18px;margin:10px 0 16px}
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{background:rgba(255,255,255,0.03);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:all .18s}
+.opt:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(2,6,23,0.6)}
+.opt[disabled]{opacity:.85;cursor:default;transform:none}
+.opt.correct{background:linear-gradient(90deg,rgba(16,185,129,0.12),rgba(16,185,129,0.06));border-color:rgba(16,185,129,0.25);color:var(--success)}
+.opt.wrong{background:linear-gradient(90deg,rgba(239,68,68,0.08),rgba(239,68,68,0.03));border-color:rgba(239,68,68,0.2);color:var(--danger)}
+.side{background:linear-gradient(180deg,rgba(255,255,255,0.015),rgba(255,255,255,0.01));padding:14px;border-radius:12px}
+.stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.stat strong{font-size:20px}
+.streak{display:flex;gap:8px;align-items:center}
+.small{font-size:13px;color:rgba(230,238,248,0.7)}
+.share{display:flex;gap:8px;margin-top:12px}
+.share a{background:rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:inherit;text-decoration:none}
+.result{display:none;text-align:center;padding:10px}
+.result h2{margin:8px 0}
+.badge{display:inline-block;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,var(--gold),#f97316);color:#061529;font-weight:800}
+footer{margin-top:12px;text-align:center;color:rgba(230,238,248,0.6);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <header>
+      <div>
+        <h1>🌬️ Kite AI — Wind Runner (Day 9 Pro)</h1>
+        <div class="meta">Pro quiz • 10 Qs • per-question timer • leaderboard-ready</div>
+      </div>
+      <div class="meta">@LOVE_MONIKA55</div>
+    </header>
+    <div class="grid">
+      <div class="quiz">
+        <div id="startScreen" class="start-screen">
+          <h2>Ready for Day 9?</h2>
+          <p class="small">10 fresh questions — each question has a 20s timer. Answer quickly to build streaks!</p>
+          <div style="margin-top:14px">
+            <button id="startBtn" class="btn">Start Pro Quiz</button>
+            <button id="practiceBtn" class="btn secondary" style="margin-left:8px">Practice Mode</button>
+          </div>
+        </div>
+        <div id="playScreen" style="display:none">
+          <div class="qhead">
+            <div class="qnum" id="qnum">Question 1 / 10</div>
+            <div class="timer"><div class="small">Time</div><div class="circle" id="timerCircle">--</div></div>
+          </div>
+          <div class="question" id="question">Question text</div>
+          <div class="options" id="options"></div>
+          <div style="display:flex;gap:10px;margin-top:12px;align-items:center">
+            <button id="nextBtn" class="btn secondary" style="display:none">Next</button>
+            <div class="small">Mode: <strong id="modeLabel">Pro</strong></div>
+          </div>
+        </div>
+        <div id="endScreen" class="result">
+          <h2>Quiz Completed</h2>
+          <div id="resultScore" style="font-size:20px;margin:8px 0">You scored 0 / 10</div>
+          <div style="margin:12px 0"><span class="badge" id="badge">Pro Novice</span></div>
+          <div style="margin-top:10px"><button id="restartBtn" class="btn">Restart</button></div>
+          <div class="share" style="justify-content:center">
+            <a id="tweetShare" target="_blank">Share on X</a>
+            <a id="copyShare" href="#">Copy Link</a>
+          </div>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="stat"><div class="small">Progress</div><div><strong id="progressPct">0%</strong></div></div>
+        <div class="progress-outer" style="height:10px;border-radius:999px;margin-bottom:8px"><div class="progress-inner" id="progBar" style="width:0%"></div></div>
+        <div class="stat"><div class="small">Score</div><div><strong id="score">0</strong></div></div>
+        <div class="stat"><div class="small">Streak</div><div><strong id="streak">0</strong></div></div>
+        <div class="stat"><div class="small">Best</div><div><strong id="best">0</strong></div></div>
+        <footer>Good luck — create original content & tag <strong>@GoKiteAI</strong></footer>
+      </aside>
+    </div>
+  </div>
+</div>
+<script>
+const data=[
+{q:"What is the primary reward for completing Wind Runner missions?",opts:["On-chain recognition & SBTs","Random airdrops","Likes on Twitter","Temporary badges"],a:0},
+{q:"How can a creator maximize visibility in the Wind Runner campaign?",opts:["Post unique AI-generated content with official hashtags","Spam posts repeatedly","Copy other creators","Only post text content"],a:0},
+{q:"What does SBT stand for in Kite AI?",opts:["Soulbound Token","Simple Blockchain Token","Social Badge Token","Standard Blockchain Test"],a:0},
+{q:"Why is on-chain verification important for UGC?",opts:["To ensure authenticity and prevent cheating","To make posts disappear","To limit user participation","To reduce AI model efficiency"],a:0},
+{q:"Which platform hosts the Kite AI Wind Runner UGC submissions?",opts:["X (Twitter)","Instagram","Telegram","Reddit"],a:0},
+{q:"What’s the purpose of daily challenges in Wind Runner?",opts:["Encourage consistent creativity and streaks","Randomly delete content","Limit SBT distribution","Test blockchain speed"],a:0},
+{q:"How do Kite AI Agents assist creators?",opts:["Automate task verification and validate creativity","Post spam content","Hide leaderboard info","Trade tokens automatically"],a:0},
+{q:"What’s a key benefit of completing all daily missions consecutively?",opts:["Increase reward chances and leaderboard position","Reset your score","Remove SBTs","Get only a minor badge"],a:0},
+{q:"Which of the following is NOT allowed in Wind Runner content?",opts:["Original AI-generated content","Spam or copied content","Creative posts aligned with themes","Posts using official hashtags"],a:1},
+{q:"What is the main goal of Wind Runner campaigns?",opts:["Empower creators and verify their on-chain achievements","Flood social media with random posts","Test token price fluctuation","Limit AI usage"],a:0}
+];
+let idx=0,score=0,streak=0,best=parseInt(localStorage.getItem('kite_best')||'0');
+const total=data.length;
+const startBtn=document.getElementById('startBtn');
+const practiceBtn=document.getElementById('practiceBtn');
+const startScreen=document.getElementById('startScreen');
+const playScreen=document.getElementById('playScreen');
+const endScreen=document.getElementById('endScreen');
+const qnum=document.getElementById('qnum');
+const questionEl=document.getElementById('question');
+const optionsEl=document.getElementById('options');
+const nextBtn=document.getElementById('nextBtn');
+const timerCircle=document.getElementById('timerCircle');
+const scoreEl=document.getElementById('score');
+const streakEl=document.getElementById('streak');
+const bestEl=document.getElementById('best');
+const progBar=document.getElementById('progBar');
+const progressPct=document.getElementById('progressPct');
+const resultScore=document.getElementById('resultScore');
+const badge=document.getElementById('badge');
+const modeLabel=document.getElementById('modeLabel');
+let timePerQ=20,timer=null,timeLeft=timePerQ,isPractice=false;
+bestEl.textContent=best;
+startBtn.addEventListener('click',()=>start(false));
+practiceBtn.addEventListener('click',()=>start(true));
+function start(practice){isPractice=!!practice;timePerQ=isPractice?0:20;modeLabel.textContent=isPractice?'Practice':'Pro';startScreen.style.display='none';playScreen.style.display='block';idx=0;score=0;streak=0;updateStats();loadQuestion();}
+function loadQuestion(){clearTimer();const item=data[idx];qnum.textContent=`Question ${idx+1} / ${total}`;questionEl.textContent=item.q;optionsEl.innerHTML='';item.opts.forEach((opt,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=opt;b.onclick=()=>choose(i,b);optionsEl.appendChild(b);});progBar.style.width=`${Math.round((idx/total)*100)}%`;progressPct.textContent=`${
